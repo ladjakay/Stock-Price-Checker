@@ -3,7 +3,6 @@ require('dotenv').config();
 const express     = require('express');
 const bodyParser  = require('body-parser');
 const cors        = require('cors');
-const helmet      = require('helmet');
 
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -11,16 +10,13 @@ const runner            = require('./test-runner');
 
 const app = express();
 
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'"],
-    styleSrc: ["'self'"],
-    imgSrc: ["'self'"],
-    objectSrc: ["'none'"],
-    baseUri: ["'self'"]
-  }
-}));
+app.use(function (req, res, next) {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; style-src 'self'; script-src 'self';"
+  );
+  next();
+});
 
 app.use('/public', express.static(process.cwd() + '/public'));
 
